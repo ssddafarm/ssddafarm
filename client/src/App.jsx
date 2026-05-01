@@ -3,6 +3,7 @@ import heroFarm from "./assets/hero-farm.svg";
 import makhanaImage from "./assets/makhana.svg";
 import moringaImage from "./assets/moringa.svg";
 import flaxseedImage from "./assets/flaxseed.svg";
+import ssddaLogo from "./assets/ssdda-logo.jpeg";
 
 const benefits = [
   "Fresh batches prepared with care",
@@ -519,8 +520,7 @@ function App() {
       <header className="topbar">
         <div className="section-inner topbar-inner">
           <a className="brand" href="/" aria-label="SSDDA Farm home">
-            <span className="brand-mark">SF</span>
-            <span className="brand-copy">SSDDA FARM</span>
+            <img className="brand-logo brand-logo-clean" src={ssddaLogo} alt="SSDDA Farm logo" />
           </a>
 
           <button
@@ -590,14 +590,6 @@ function App() {
                   <div className="hero-actions">
                     <a className="primary-button" href="/#products">
                       Explore Products
-                    </a>
-                    <a
-                      className="secondary-button"
-                      href="https://ssddafarm.com"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Visit Website
                     </a>
                   </div>
 
@@ -1378,8 +1370,7 @@ function App() {
         <div className="section-inner footer-grid">
           <div className="footer-brand">
             <a className="brand inverse" href="/">
-              <span className="brand-mark">SF</span>
-              <span className="brand-copy">SSDDA FARM</span>
+              <img className="brand-logo brand-logo-footer" src={ssddaLogo} alt="SSDDA Farm logo" />
             </a>
             <p>
               We bring wholesome dry fruits, foods, and snacks from honest sourcing to your

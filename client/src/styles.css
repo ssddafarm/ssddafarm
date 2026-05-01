@@ -155,6 +155,19 @@ img {
   min-width: 0;
 }
 
+.brand-logo {
+  display: block;
+  width: 46px;
+  height: 46px;
+  max-width: none;
+  object-fit: contain;
+}
+
+.brand-logo-clean {
+  mix-blend-mode: multiply;
+  filter: saturate(1.04) contrast(1.05);
+}
+
 .brand-copy {
   letter-spacing: 0.08em;
   white-space: nowrap;
@@ -1444,6 +1457,23 @@ img {
   color: rgba(255, 255, 255, 0.72);
 }
 
+.footer-brand .brand-logo {
+  width: 46px;
+  height: 46px;
+}
+
+.brand-logo-footer {
+  mix-blend-mode: normal;
+}
+
+.footer-brand .brand {
+  padding: 6px 10px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: 0 8px 20px rgba(9, 18, 34, 0.3);
+}
+
 .footer-socials {
   display: flex;
   flex-wrap: wrap;
@@ -1596,16 +1626,9 @@ img {
     gap: 10px;
   }
 
-  .brand-mark {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    font-size: 0.82rem;
-  }
-
-  .brand-copy {
-    font-size: 1.42rem;
-    letter-spacing: 0.06em;
+  .brand-logo {
+    width: 46px;
+    height: 46px;
   }
 
   .nav-toggle {
