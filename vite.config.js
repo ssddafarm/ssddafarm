@@ -1,0 +1,27 @@
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const backendPort = process.env.PORT || "5051";
+const apiProxyTarget = process.env.API_PROXY_TARGET || `http://127.0.0.1:${backendPort}`;
+
+export default defineConfig({
+  plugins: [react()],
+  root: "client",
+  server: {
+    host: "0.0.0.0",
+    port: 5173,
+    proxy: {
+      "/api": {
+        target: apiProxyTarget,
+        changeOrigin: true
+      }
+    }
+  },
+  build: {
+    outDir: "../dist",
+    emptyOutDir: true
+  }
+});
