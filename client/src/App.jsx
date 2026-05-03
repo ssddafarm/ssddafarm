@@ -1308,7 +1308,7 @@ function App() {
         {currentPath === "/contact" ? (
           <>
             <section className="section page-hero section-soft">
-              <div className="section-inner page-hero-grid">
+              <div className="section-inner page-hero-grid page-hero-grid-single">
                 <div className="page-copy">
                   <span className="eyebrow">Contact SSDDA Farm</span>
                   <h1>Let’s connect for orders, partnerships, and brand enquiries.</h1>
@@ -1316,9 +1316,6 @@ function App() {
                     Reach SSDDA Farm through our website, email, or WhatsApp. You can also use
                     the form below and our team will get back to you soon.
                   </p>
-                </div>
-                <div className="page-hero-card">
-                  <img src={flaxseedImage} alt="SSDDA Farm contact page illustration" />
                 </div>
               </div>
             </section>

@@ -1001,6 +1001,10 @@ img {
   align-items: center;
 }
 
+.page-hero-grid-single {
+  grid-template-columns: 1fr;
+}
+
 .page-copy {
   display: grid;
   gap: 20px;
