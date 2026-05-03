@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
+  <rect width="1200" height="700" fill="#f5f6fa"/>
+  <rect x="40" y="40" width="1120" height="620" rx="20" fill="#ffffff" stroke="#d9deea"/>
+  <text x="80" y="100" font-family="Arial, sans-serif" font-size="38" font-weight="700" fill="#1a2a4a">Step 1: Open Google Form Editor</text>
+  <text x="80" y="145" font-family="Arial, sans-serif" font-size="24" fill="#32476b">Create fields that match your website contact form.</text>
+
+  <rect x="80" y="185" width="1040" height="430" rx="16" fill="#f8faff" stroke="#cfd8ec"/>
+  <rect x="115" y="230" width="420" height="48" rx="8" fill="#eef3ff" stroke="#b8c7ec"/>
+  <text x="130" y="262" font-family="Arial, sans-serif" font-size="22" fill="#1f3870">First Name</text>
+  <rect x="115" y="292" width="420" height="48" rx="8" fill="#eef3ff" stroke="#b8c7ec"/>
+  <text x="130" y="324" font-family="Arial, sans-serif" font-size="22" fill="#1f3870">Last Name</text>
+  <rect x="115" y="354" width="420" height="48" rx="8" fill="#eef3ff" stroke="#b8c7ec"/>
+  <text x="130" y="386" font-family="Arial, sans-serif" font-size="22" fill="#1f3870">Email</text>
+  <rect x="115" y="416" width="420" height="48" rx="8" fill="#eef3ff" stroke="#b8c7ec"/>
+  <text x="130" y="448" font-family="Arial, sans-serif" font-size="22" fill="#1f3870">Company</text>
+
+  <rect x="630" y="230" width="420" height="48" rx="8" fill="#eef3ff" stroke="#b8c7ec"/>
+  <text x="645" y="262" font-family="Arial, sans-serif" font-size="22" fill="#1f3870">Inquiry Type</text>
+  <rect x="630" y="292" width="420" height="48" rx="8" fill="#eef3ff" stroke="#b8c7ec"/>
+  <text x="645" y="324" font-family="Arial, sans-serif" font-size="22" fill="#1f3870">Quantity</text>
+  <rect x="630" y="354" width="420" height="48" rx="8" fill="#eef3ff" stroke="#b8c7ec"/>
+  <text x="645" y="386" font-family="Arial, sans-serif" font-size="22" fill="#1f3870">Subject</text>
+  <rect x="630" y="416" width="420" height="110" rx="8" fill="#eef3ff" stroke="#b8c7ec"/>
+  <text x="645" y="448" font-family="Arial, sans-serif" font-size="22" fill="#1f3870">Message</text>
+
+  <rect x="80" y="630" width="1040" height="16" rx="8" fill="#e8ecf8"/>
+  <rect x="80" y="630" width="250" height="16" rx="8" fill="#5a78d6"/>
+</svg>

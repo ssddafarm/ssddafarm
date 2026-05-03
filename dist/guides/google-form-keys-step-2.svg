@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
+  <rect width="1200" height="700" fill="#f5f6fa"/>
+  <rect x="40" y="40" width="1120" height="620" rx="20" fill="#ffffff" stroke="#d9deea"/>
+  <text x="80" y="100" font-family="Arial, sans-serif" font-size="38" font-weight="700" fill="#1a2a4a">Step 2: Generate Pre-filled Link</text>
+  <text x="80" y="145" font-family="Arial, sans-serif" font-size="24" fill="#32476b">In Google Form editor: three dots (⋮) → Get pre-filled link.</text>
+
+  <rect x="80" y="185" width="1040" height="430" rx="16" fill="#f8faff" stroke="#cfd8ec"/>
+  <rect x="120" y="225" width="960" height="54" rx="10" fill="#eceff7" stroke="#c7d0e6"/>
+  <text x="145" y="260" font-family="Arial, sans-serif" font-size="24" fill="#263a63">Google Form - Editor Toolbar</text>
+  <circle cx="1030" cy="252" r="16" fill="#6179c8"/>
+  <text x="1022" y="258" font-family="Arial, sans-serif" font-size="20" fill="#ffffff">⋮</text>
+  <text x="845" y="315" font-family="Arial, sans-serif" font-size="24" fill="#425a88">Click here</text>
+  <path d="M 895 322 C 940 335, 975 320, 1010 274" stroke="#425a88" stroke-width="4" fill="none"/>
+
+  <rect x="150" y="340" width="900" height="230" rx="12" fill="#ffffff" stroke="#d7deef"/>
+  <text x="180" y="385" font-family="Arial, sans-serif" font-size="22" fill="#1f3870">Fill each field with unique values:</text>
+  <text x="180" y="425" font-family="Courier New, monospace" font-size="20" fill="#3a4d77">First Name = FN_TEST</text>
+  <text x="180" y="455" font-family="Courier New, monospace" font-size="20" fill="#3a4d77">Last Name = LN_TEST</text>
+  <text x="180" y="485" font-family="Courier New, monospace" font-size="20" fill="#3a4d77">Email = mail@test.com</text>
+  <text x="180" y="515" font-family="Courier New, monospace" font-size="20" fill="#3a4d77">...and so on for all fields</text>
+  <rect x="760" y="520" width="250" height="42" rx="10" fill="#5a78d6"/>
+  <text x="815" y="548" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#ffffff">Get Link</text>
+</svg>

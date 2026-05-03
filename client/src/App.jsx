@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import heroFarm from "./assets/hero-farm.svg";
-import makhanaImage from "./assets/makhana.svg";
-import moringaImage from "./assets/moringa.svg";
-import flaxseedImage from "./assets/flaxseed.svg";
+import makhanaImage from "./assets/makhana.jpeg";
+import moringaImage from "./assets/moringa_powder.jpeg";
+import flaxseedImage from "./assets/flaxseed.jpeg";
 import ssddaLogo from "./assets/ssdda-logo.jpeg";
 
 const benefits = [
@@ -319,7 +319,6 @@ const contactItems = [
   }
 ];
 
-const productFeedbackStorageKey = "ssdda-product-feedback";
 const googleFormUrl = import.meta.env.VITE_GOOGLE_FORM_URL || "";
 
 const initialForm = {
@@ -354,22 +353,17 @@ function getCurrentPath() {
   return ["/", "/about", "/contact", "/buy"].includes(normalizedPath) ? normalizedPath : "/";
 }
 
-function getInitialProductFeedback() {
-  if (typeof window === "undefined") {
-    return {};
+async function requestJson(url, options = {}) {
+  const response = await fetch(url, options);
+  const contentType = response.headers.get("content-type") || "";
+  const isJson = contentType.includes("application/json");
+  const result = isJson ? await response.json().catch(() => null) : null;
+
+  if (!response.ok) {
+    throw new Error(result?.message || "Unable to complete this request.");
   }
 
-  try {
-    const rawFeedback = window.localStorage.getItem(productFeedbackStorageKey);
-    if (!rawFeedback) {
-      return {};
-    }
-
-    const parsedFeedback = JSON.parse(rawFeedback);
-    return parsedFeedback && typeof parsedFeedback === "object" ? parsedFeedback : {};
-  } catch (_error) {
-    return {};
-  }
+  return result;
 }
 
 function formatNutritionItem(item) {
@@ -383,6 +377,16 @@ function formatNutritionItem(item) {
       <strong>{label.trim()}:</strong> {rest.join(":").trim()}
     </>
   );
+}
+
+function normalizeRatingValue(value) {
+  const numericValue = Number(value);
+  if (!Number.isFinite(numericValue)) {
+    return null;
+  }
+
+  const roundedValue = Math.round(numericValue);
+  return Math.min(5, Math.max(1, roundedValue));
 }
 
 function SocialIcon({ icon }) {
@@ -425,34 +429,68 @@ function App() {
   const [formData, setFormData] = useState(initialForm);
   const [formState, setFormState] = useState({ status: "idle", message: "" });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [productFeedback, setProductFeedback] = useState(getInitialProductFeedback);
+  const [productFeedback, setProductFeedback] = useState([]);
   const [feedbackDraft, setFeedbackDraft] = useState({ rating: 5, message: "" });
+  const [feedbackState, setFeedbackState] = useState({ status: "idle", message: "" });
+  const [showAllFeedback, setShowAllFeedback] = useState(false);
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [newsletterState, setNewsletterState] = useState({ status: "idle", message: "" });
   const currentPath = getCurrentPath();
 
   const activeProduct = products.find((product) => product.id === selectedProduct);
   const buyProduct = activeProduct || products[0];
-  const activeFeedback = productFeedback[selectedProduct] || [];
-  const averageRating = activeFeedback.length
-    ? (
-        activeFeedback.reduce((sum, item) => sum + Number(item.rating || 0), 0) /
-        activeFeedback.length
-      ).toFixed(1)
+  const activeFeedback = productFeedback;
+  const validRatingValues = activeFeedback
+    .map((item) => normalizeRatingValue(item.rating))
+    .filter((value) => value !== null);
+  const averageRating = validRatingValues.length
+    ? (validRatingValues.reduce((sum, value) => sum + value, 0) / validRatingValues.length).toFixed(1)
     : "0.0";
+  const displayedFeedback = showAllFeedback ? activeFeedback : activeFeedback.slice(0, 5);
 
   useEffect(() => {
-    if (typeof window === "undefined") {
-      return;
+    let cancelled = false;
+
+    async function loadFeedback() {
+      setFeedbackState((current) => ({ ...current, status: "loading", message: "" }));
+
+      try {
+        const result = await requestJson(
+          `/api/feedback?productId=${encodeURIComponent(selectedProduct)}`
+        );
+        if (cancelled) {
+          return;
+        }
+
+        setProductFeedback(Array.isArray(result?.feedback) ? result.feedback : []);
+        setShowAllFeedback(false);
+        setFeedbackState({ status: "idle", message: "" });
+      } catch (error) {
+        if (cancelled) {
+          return;
+        }
+
+        setProductFeedback([]);
+        setFeedbackState({
+          status: "error",
+          message: error.message || "Unable to load feedback right now."
+        });
+      }
     }
 
-    window.localStorage.setItem(productFeedbackStorageKey, JSON.stringify(productFeedback));
-  }, [productFeedback]);
+    loadFeedback();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedProduct]);
 
   async function handleSubmit(event) {
     event.preventDefault();
     setFormState({ status: "loading", message: "Sending your message..." });
 
     try {
-      const response = await fetch("/api/contact", {
+      const result = await requestJson("/api/contact", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -460,21 +498,15 @@ function App() {
         body: JSON.stringify(formData)
       });
 
-      const contentType = response.headers.get("content-type") || "";
-      const isJson = contentType.includes("application/json");
-      const result = isJson ? await response.json().catch(() => null) : null;
-
-      if (!response.ok) {
-        throw new Error(result?.message || "Unable to submit right now.");
-      }
-
       if (!result?.message) {
         throw new Error("Contact API did not return a valid response.");
       }
 
       setFormState({
         status: "success",
-        message: result.message
+        message: result.googleFormSynced
+          ? result.message
+          : `${result.message} (Google Form sync pending: ${result.googleFormReason || result.googleFormStatus || "not configured"})`
       });
       setFormData(initialForm);
     } catch (error) {
@@ -490,29 +522,77 @@ function App() {
     setFormData((current) => ({ ...current, [name]: value }));
   }
 
-  function handleFeedbackSubmit(event) {
+  async function handleFeedbackSubmit(event) {
     event.preventDefault();
 
     const trimmedMessage = feedbackDraft.message.trim();
     if (!trimmedMessage) {
+      setFeedbackState({
+        status: "error",
+        message: "Please add feedback before submitting."
+      });
       return;
     }
 
-    const newEntry = {
-      rating: Number(feedbackDraft.rating),
-      message: trimmedMessage,
-      timestamp: new Date().toISOString()
-    };
+    setFeedbackState({ status: "loading", message: "Submitting feedback..." });
 
-    setProductFeedback((current) => {
-      const productEntries = current[selectedProduct] || [];
-      return {
-        ...current,
-        [selectedProduct]: [newEntry, ...productEntries].slice(0, 20)
-      };
-    });
+    try {
+      const result = await requestJson("/api/feedback", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          productId: selectedProduct,
+          rating: Number(feedbackDraft.rating),
+          message: trimmedMessage
+        })
+      });
 
-    setFeedbackDraft({ rating: 5, message: "" });
+      const createdFeedback = result?.feedback;
+      if (!createdFeedback) {
+        throw new Error("Feedback API did not return a valid response.");
+      }
+
+      setProductFeedback((current) => [createdFeedback, ...current].slice(0, 20));
+      setShowAllFeedback(false);
+      setFeedbackDraft({ rating: 5, message: "" });
+      setFeedbackState({
+        status: "success",
+        message: result.message || "Thank you for your feedback."
+      });
+    } catch (error) {
+      setFeedbackState({
+        status: "error",
+        message: error.message || "Unable to submit feedback right now."
+      });
+    }
+  }
+
+  async function handleNewsletterSubmit(event) {
+    event.preventDefault();
+    setNewsletterState({ status: "loading", message: "Subscribing..." });
+
+    try {
+      const result = await requestJson("/api/newsletter", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email: newsletterEmail })
+      });
+
+      setNewsletterEmail("");
+      setNewsletterState({
+        status: "success",
+        message: result?.message || "Subscribed successfully."
+      });
+    } catch (error) {
+      setNewsletterState({
+        status: "error",
+        message: error.message || "Unable to subscribe right now."
+      });
+    }
   }
 
   return (
@@ -848,18 +928,17 @@ function App() {
                   <div className="detail-card feedback-card">
                     <h3>Product Feedback & Rating</h3>
                     <p className="feedback-summary">
-                      Customer rating: <strong>{averageRating}</strong> / 5 from{" "}
-                      <strong>{activeFeedback.length}</strong> feedback entries.
+                      Customer rating: <strong>{averageRating}</strong> / 5.
                     </p>
                     <form className="feedback-form" onSubmit={handleFeedbackSubmit}>
                       <label>
                         Rating
                         <select
-                          value={feedbackDraft.rating}
+                          value={String(feedbackDraft.rating)}
                           onChange={(event) =>
                             setFeedbackDraft((current) => ({
                               ...current,
-                              rating: Number(event.target.value)
+                              rating: normalizeRatingValue(event.target.value) || 5
                             }))
                           }
                         >
@@ -884,19 +963,48 @@ function App() {
                           }
                         />
                       </label>
-                      <button className="primary-button small" type="submit">
-                        Submit Feedback
+                      <button
+                        className="primary-button small"
+                        type="submit"
+                        disabled={feedbackState.status === "loading"}
+                      >
+                        {feedbackState.status === "loading" ? "Submitting..." : "Submit Feedback"}
                       </button>
                     </form>
+                    {feedbackState.message ? (
+                      <p
+                        className={
+                          feedbackState.status === "error"
+                            ? "form-message error"
+                            : "form-message success"
+                        }
+                      >
+                        {feedbackState.message}
+                      </p>
+                    ) : null}
                     {activeFeedback.length ? (
-                      <ul className="feedback-list">
-                        {activeFeedback.slice(0, 4).map((entry) => (
-                          <li key={`${entry.timestamp}-${entry.message}`}>
-                            <strong>{entry.rating}/5</strong>
-                            <span>{entry.message}</span>
-                          </li>
-                        ))}
-                      </ul>
+                      <>
+                        <ul className="feedback-list">
+                          {displayedFeedback.map((entry) => {
+                            const entryRating = normalizeRatingValue(entry.rating);
+                            return (
+                              <li key={`${entry.timestamp}-${entry.message}`}>
+                                <strong>{entryRating !== null ? `${entryRating}/5` : "No rating"}</strong>
+                                <span>{entry.message}</span>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                        {activeFeedback.length > 5 ? (
+                          <button
+                            className="secondary-button small"
+                            type="button"
+                            onClick={() => setShowAllFeedback((current) => !current)}
+                          >
+                            {showAllFeedback ? "Show Less" : "Show More"}
+                          </button>
+                        ) : null}
+                      </>
                     ) : (
                       <p className="feedback-empty">No feedback yet for this product.</p>
                     )}
@@ -1086,18 +1194,18 @@ function App() {
                   <div className="about-bottom-row">
                     <div className="why-card">
                       <h3>Why Choose SSDDA Farm</h3>
-                      <div className="pill-row">
-                        {aboutHighlights.map((item) => (
-                          <span key={item} className="info-pill">
-                            {item}
-                          </span>
-                        ))}
-                      </div>
-                      <p>
+                      <p className="why-card-intro">
                         At SSDDA Farm, we believe food should be simple, natural, and full of
                         flavor. We are proud to bring you products that are fresh from the farm
                         and delicious in every bite.
                       </p>
+                      <ul className="why-list">
+                        {aboutHighlights.map((item) => (
+                          <li key={item} className="why-list-item">
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
 
                     <div className="about-note">
@@ -1416,10 +1524,27 @@ function App() {
           <div className="footer-column">
             <h3>Newsletter</h3>
             <p>Subscribe to hear about fresh arrivals, offers, and wholesome farm updates.</p>
-            <div className="newsletter-box">
-              <input placeholder="Enter your email" type="email" />
-              <button type="button">Join</button>
-            </div>
+            <form className="newsletter-box" onSubmit={handleNewsletterSubmit}>
+              <input
+                placeholder="Enter your email"
+                type="email"
+                required
+                value={newsletterEmail}
+                onChange={(event) => setNewsletterEmail(event.target.value)}
+              />
+              <button type="submit" disabled={newsletterState.status === "loading"}>
+                {newsletterState.status === "loading" ? "Joining..." : "Join"}
+              </button>
+            </form>
+            {newsletterState.message ? (
+              <p
+                className={
+                  newsletterState.status === "error" ? "form-message error" : "form-message success"
+                }
+              >
+                {newsletterState.message}
+              </p>
+            ) : null}
           </div>
         </div>
       </footer>
